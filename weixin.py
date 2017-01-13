@@ -281,7 +281,7 @@ class WebWeixin(object):
             elif Contact['UserName'] in SpecialUsers:  # 特殊账号
                 ContactList.remove(Contact)
                 self.SpecialUsersList.append(Contact)
-            elif Contact['UserName'].find('@@') != -1:  # 群聊
+            elif '@@' in Contact['UserName']:  # 群聊
                 ContactList.remove(Contact)
                 self.GroupList.append(Contact)
             elif Contact['UserName'] == self.User['UserName']:  # 自己
@@ -338,10 +338,9 @@ class WebWeixin(object):
             'webpush.wechat.com',
             'webpush1.wechat.com',
             'webpush2.wechat.com',
-            'webpush1.wechatapp.com',
-            'webpush.wechatapp.com',
             'webpush.wx.qq.com',
-            'webpush.wx2.qq.com',
+            'webpush2.wx.qq.com'
+            # 'webpush.wechatapp.com'
         ]
         for host in SyncHost:
             self.syncHost = host
@@ -697,8 +696,8 @@ class WebWeixin(object):
 
             if msg['raw_msg']['FromUserName'][:2] == '@@':
                 # 接收到来自群的消息
-                if re.search(":<br/>", content, re.IGNORECASE):
-                    [people, content] = content.split(':<br/>')
+                if ":<br/>" in content:
+                    [people, content] = content.split(':<br/>', 1)
                     groupName = srcName
                     srcName = self.getUserRemarkName(people)
                     dstName = 'GROUP'
@@ -1077,7 +1076,7 @@ class WebWeixin(object):
             request = urllib2.Request(url=url, data=urllib.urlencode(params))
 
 
-        try: 
+        try:
             response = urllib2.urlopen(request)
             data = response.read()
             if jsonfmt:
